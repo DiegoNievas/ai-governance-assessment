@@ -1,73 +1,53 @@
-# React + TypeScript + Vite
+# AI Governance Assessment Tool
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An internal web application designed for consultants and practitioners to assess a customer's readiness to deploy AI agents. This tool provides a structured questionnaire that evaluates organizational maturity, highlights potential risks, and offers actionable recommendations based on established AI governance frameworks like **ISO/IEC 42001** and the **NIST AI RMF**.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Readiness Questionnaire:** A comprehensive assessment module focusing on AI Governance, Risk Management, Security, and Operational Readiness.
+- **Interactive Dashboard:** Visualizes the assessment results with dynamic Radar charts, providing an immediate overview of maturity across different governance domains.
+- **Executive Summary & Detailed Findings:** Generates professional-grade reports outlining risk ratings and tailored recommendations for the customer.
+- **Export Capabilities:** Easily export the assessment results as a PDF or Markdown document to facilitate effective customer workshops and hand-offs.
+- **Demo Mode:** Built-in capabilities to quickly populate the tool with sample data for demonstration purposes.
 
-## React Compiler
+## How It Was Built
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+This project is built using a modern, fast, and scalable front-end technology stack designed for responsiveness and professional aesthetics:
 
-## Expanding the ESLint configuration
+- **Framework:** [React 19](https://react.dev/) with **TypeScript** for robust, type-safe UI component development.
+- **Build Tool:** [Vite](https://vitejs.dev/) for extremely fast Hot Module Replacement (HMR) and optimized production builds.
+- **State Management:** [Zustand](https://github.com/pmndrs/zustand) to handle the application's global state, including questionnaire progress, scoring, and data persistence.
+- **Styling:** [Tailwind CSS 4](https://tailwindcss.com/) for rapid utility-first styling, providing a sleek, executive-friendly design. Utility functions like `clsx` and `tailwind-merge` are used to manage dynamic component classes smoothly.
+- **Data Visualization:** [Recharts](https://recharts.org/) is used to render responsive and customizable Radar charts for the maturity score dashboard.
+- **Icons:** [Lucide React](https://lucide.dev/) for clean and consistent iconography throughout the app.
+- **Exports:** Integrated with `html2pdf.js` to enable seamless client-side PDF generation.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Getting Started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+To run this project locally on your machine:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Prerequisites
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+You will need [Node.js](https://nodejs.org/) installed on your machine.
+
+### Installation
+
+1. Clone this repository (if you haven't already).
+2. Navigate to the project directory in your terminal:
+   ```bash
+   cd ai-governance-assessment
+   ```
+3. Install the dependencies:
+   ```bash
+   npm install
+   ```
+
+### Running the Development Server
+
+Start the local Vite development server by running:
+
+```bash
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+This will launch the application locally (typically at `http://localhost:5173`). Have fun exploring the assessment modules and generating governance reports!
