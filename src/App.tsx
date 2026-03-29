@@ -1,0 +1,91 @@
+import { useState } from 'react';
+import { Layout } from './components/layout/Layout';
+import { CustomerDetailsForm } from './components/forms/CustomerDetailsForm';
+import { QuestionnaireSection } from './components/questionnaire/QuestionnaireSection';
+import { Dashboard } from './components/results/Dashboard';
+import { useAssessmentStore } from './store/assessmentStore';
+import { ClipboardList, Settings, BarChart3 } from 'lucide-react';
+
+export type AssessmentStep = 'setup' | 'assessment' | 'results';
+
+function App() {
+  const [currentStep, setCurrentStep] = useState<AssessmentStep>('setup');
+  const { domains } = useAssessmentStore();
+
+  const handleNext = () => {
+    if (currentStep === 'setup') setCurrentStep('assessment');
+    else if (currentStep === 'assessment') setCurrentStep('results');
+  };
+
+  const handleBack = () => {
+    if (currentStep === 'assessment') setCurrentStep('setup');
+    else if (currentStep === 'results') setCurrentStep('assessment');
+  };
+
+  const calculateProgress = () => {
+    const totalQuestions = domains.reduce((acc, d) => acc + d.questions.length, 0);
+    const answeredQuestions = domains.reduce((acc, d) => 
+      acc + d.questions.filter(q => q.score !== null || q.notApplicable).length
+    , 0);
+    return Math.round((answeredQuestions / totalQuestions) * 100);
+  };
+
+  return (
+    <Layout>
+      <div className="w-full flex-grow flex flex-col">
+        {/* Navigation / Progress Header */}
+        <div className="mb-8 bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <nav className="flex space-x-4 h-full items-center">
+              <button 
+                onClick={() => setCurrentStep('setup')}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${currentStep === 'setup' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+              >
+                <Settings className="w-4 h-4" /> Setup
+              </button>
+              <button 
+                onClick={() => setCurrentStep('assessment')}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${currentStep === 'assessment' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+              >
+                <ClipboardList className="w-4 h-4" /> Assessment
+              </button>
+              <button 
+                onClick={() => setCurrentStep('results')}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${currentStep === 'results' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+              >
+                <BarChart3 className="w-4 h-4" /> Results
+              </button>
+            </nav>
+          </div>
+          
+          {/* Progress Indicator */}
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-gray-500">Progress</span>
+            <div className="w-32 bg-gray-200 rounded-full h-2.5">
+              <div 
+                className="bg-blue-600 h-2.5 rounded-full transition-all duration-500 ease-out" 
+                style={{ width: `${calculateProgress()}%` }}
+              ></div>
+            </div>
+            <span className="text-sm font-bold text-gray-700 w-9 text-right">{calculateProgress()}%</span>
+          </div>
+        </div>
+
+        {/* Dynamic Content */}
+        <div className="flex-grow">
+          {currentStep === 'setup' && (
+            <CustomerDetailsForm onNext={handleNext} />
+          )}
+          {currentStep === 'assessment' && (
+            <QuestionnaireSection onNext={handleNext} onBack={handleBack} />
+          )}
+          {currentStep === 'results' && (
+            <Dashboard onBack={handleBack} />
+          )}
+        </div>
+      </div>
+    </Layout>
+  );
+}
+
+export default App;

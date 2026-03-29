@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  body {
+    @apply antialiased text-gray-900 bg-gray-50;
+  }
+}
+
+@media print {
+  .hide-on-print {
+    display: none !important;
+  }
+  body, .print-area {
+    background: white !important;
+    color: black !important;
+  }
+  .print-area {
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
