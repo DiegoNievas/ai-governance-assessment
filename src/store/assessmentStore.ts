@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { initialCustomerDetails, defaultDomains } from '../data/questionnaire';
 import type { CustomerDetails, Domain, Score } from '../data/questionnaire';
+import { calculateResults } from '../utils/scoring';
+import { supabase } from '../lib/supabase';
 
 interface AssessmentState {
   customerDetails: CustomerDetails;
@@ -12,11 +14,12 @@ interface AssessmentState {
   toggleNotApplicable: (domainId: string, questionId: string) => void;
   resetAssessment: () => void;
   loadDemoData: () => void;
+  submitToCloud: () => Promise<void>;
 }
 
 export const useAssessmentStore = create<AssessmentState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       customerDetails: { ...initialCustomerDetails },
       domains: JSON.parse(JSON.stringify(defaultDomains)),
 
@@ -75,6 +78,7 @@ export const useAssessmentStore = create<AssessmentState>()(
       loadDemoData: () => set({
         customerDetails: {
           customerName: 'Acme Corp Financial',
+          industry: 'Financial Services',
           workshopDate: new Date().toISOString().split('T')[0],
           consultantName: 'Jane Doe',
           contactName: 'John Smith (CTO)',
@@ -97,7 +101,29 @@ export const useAssessmentStore = create<AssessmentState>()(
             notApplicable: false
           }))
         }))
-      })
+      }),
+
+      submitToCloud: async () => {
+        const state = get();
+        const results = calculateResults(state.domains);
+        
+        const { error } = await supabase.from('assessments').insert({
+          customer_name: state.customerDetails.customerName,
+          industry: state.customerDetails.industry || null,
+          consultant_name: state.customerDetails.consultantName || null,
+          overall_score: results.overallMaturityScore,
+          full_data: {
+            customerDetails: state.customerDetails,
+            domains: state.domains,
+            results
+          }
+        });
+
+        if (error) {
+          console.error("Failed to push to Supabase:", error);
+          throw new Error(error.message);
+        }
+      }
     }),
     {
       name: 'ai-governance-assessment-storage',

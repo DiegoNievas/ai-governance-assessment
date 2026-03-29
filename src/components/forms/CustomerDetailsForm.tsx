@@ -50,6 +50,19 @@ export const CustomerDetailsForm: React.FC<CustomerDetailsFormProps> = ({ onNext
           </div>
 
           <div>
+            <label htmlFor="industry" className="block text-sm font-medium text-gray-700">Industry</label>
+            <input
+              type="text"
+              name="industry"
+              id="industry"
+              value={customerDetails.industry}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+              placeholder="E.g., Financial Services"
+            />
+          </div>
+
+          <div>
             <label htmlFor="workshopDate" className="block text-sm font-medium text-gray-700">Workshop Date</label>
             <input
               type="date"

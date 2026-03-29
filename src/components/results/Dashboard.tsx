@@ -1,10 +1,10 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useAssessmentStore } from '../../store/assessmentStore';
 import { calculateResults } from '../../utils/scoring';
 import { RadarChartComp } from './RadarChartComp';
 import { DetailedFindings } from './DetailedFindings';
 import { ExecutiveSummary } from './ExecutiveSummary';
-import { AlertTriangle, TrendingUp, CheckCircle, Download, Copy, Printer } from 'lucide-react';
+import { AlertTriangle, TrendingUp, CheckCircle, Download, Copy, Printer, CloudUpload } from 'lucide-react';
 // We use dynamic imports for html2pdf to avoid initial bundle bloat and SSR issues if any
 import html2pdf from 'html2pdf.js';
 
@@ -14,10 +14,12 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onBack, isAtturraBranded }) => {
-  const { customerDetails, domains } = useAssessmentStore();
+  const { customerDetails, domains, submitToCloud } = useAssessmentStore();
   const results = useMemo(() => calculateResults(domains), [domains]);
   
   const contentRef = useRef<HTMLDivElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const getRiskColor = (rating: string) => {
     switch (rating) {
@@ -76,6 +78,22 @@ ${results.recommendedAction}
     alert("Executive summary copied to clipboard!");
   };
 
+  const handleCloudSubmit = async () => {
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+    try {
+      await submitToCloud();
+      setSubmitStatus('success');
+      setTimeout(() => setSubmitStatus('idle'), 3000);
+    } catch (err) {
+      console.error(err);
+      setSubmitStatus('error');
+      alert("Failed to save to cloud. Check console for details.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const primaryColorBtn = isAtturraBranded ? 'bg-atturra-600 hover:bg-atturra-700' : 'bg-blue-600 hover:bg-blue-700';
 
   return (
@@ -86,7 +104,18 @@ ${results.recommendedAction}
         <button onClick={onBack} className="text-sm font-medium text-gray-600 hover:text-gray-900 border border-gray-300 px-4 py-2 rounded-md transition-colors">
           Edit Assessment
         </button>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3 items-center">
+          {submitStatus === 'success' && <span className="text-green-600 text-sm font-medium mr-2">Saved to Cloud!</span>}
+          <button 
+            onClick={handleCloudSubmit} 
+            disabled={isSubmitting}
+            className={`flex items-center gap-2 text-sm font-medium text-white px-4 py-2 rounded-md shadow-sm transition-colors hide-on-print ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-800 hover:bg-gray-900'}`}
+          >
+            <CloudUpload className="w-4 h-4" /> {isSubmitting ? 'Saving...' : 'Save to Cloud'}
+          </button>
+          
+          <span className="w-px h-6 bg-gray-200 hide-on-print mx-1"></span>
+
           <button onClick={handleCopyToClipboard} className="flex items-center gap-2 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-300 px-4 py-2 rounded-md transition-colors">
             <Copy className="w-4 h-4" /> Copy Summary
           </button>

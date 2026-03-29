@@ -25,6 +25,7 @@ export interface CustomerDetails {
   businessUnit: string;
   assessmentScope: string;
   notes: string;
+  industry: string;
 }
 
 export const initialCustomerDetails: CustomerDetails = {
@@ -35,6 +36,7 @@ export const initialCustomerDetails: CustomerDetails = {
   businessUnit: '',
   assessmentScope: '',
   notes: '',
+  industry: '',
 };
 
 export const defaultDomains: Domain[] = [
