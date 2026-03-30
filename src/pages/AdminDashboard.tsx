@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { FileText, Plus, ShieldAlert, LogOut } from 'lucide-react';
+import { FileText, Plus, ShieldAlert, LogOut, TrendingUp, BarChart3, AlertTriangle, Layers, Building2 } from 'lucide-react';
+import { useMemo } from 'react';
 
 export const AdminDashboard: React.FC = () => {
   const { profile, signOut } = useAuth();
@@ -35,6 +36,80 @@ export const AdminDashboard: React.FC = () => {
     fetchAssessments();
   }, [profile]);
 
+  const analytics = useMemo(() => {
+    if (assessments.length === 0) return null;
+
+    const totalPipeline = assessments.length;
+    let totalScore = 0;
+    let readyForPilot = 0;
+    const gapFrequencies: Record<string, number> = {};
+    const industryScores: Record<string, { total: number, count: number }> = {};
+    const funnel: Record<string, number> = {
+      Initial: 0, Emerging: 0, Developing: 0, Managed: 0, Mature: 0
+    };
+
+    assessments.forEach(a => {
+      const data = a.full_data || {};
+      const results = data.results;
+      const details = data.customerDetails;
+      
+      if (!results) return;
+
+      totalScore += results.overallMaturityScore || 0;
+
+      // Readiness
+      if (results.riskRating === 'Low' || results.riskRating === 'Moderate') {
+        if (results.overallMaturityScore >= 2.5) {
+          readyForPilot++;
+        }
+      }
+
+      // Top Gaps
+      if (results.topGaps && Array.isArray(results.topGaps)) {
+        results.topGaps.forEach((gap: any) => {
+          gapFrequencies[gap.title] = (gapFrequencies[gap.title] || 0) + 1;
+        });
+      }
+
+      // Industry Benchmarks
+      const industry = details?.industry || 'Unknown';
+      if (!industryScores[industry]) industryScores[industry] = { total: 0, count: 0 };
+      industryScores[industry].total += results.overallMaturityScore || 0;
+      industryScores[industry].count += 1;
+
+      // Funnel
+      if (results.maturityLevel) {
+        funnel[results.maturityLevel] = (funnel[results.maturityLevel] || 0) + 1;
+      }
+    });
+
+    const avgMaturity = Number((totalScore / totalPipeline).toFixed(2));
+    const deploymentReadiness = Number(((readyForPilot / totalPipeline) * 100).toFixed(0));
+    
+    let topSystemicVulnerability = 'None found';
+    let maxGap = 0;
+    Object.entries(gapFrequencies).forEach(([title, count]) => {
+        if (count > maxGap) {
+            maxGap = count;
+            topSystemicVulnerability = title;
+        }
+    });
+
+    const industryBenchmarks = Object.entries(industryScores)
+      .map(([industry, stats]) => ({ industry, avg: Number((stats.total / stats.count).toFixed(2)) }))
+      .sort((a,b) => b.avg - a.avg);
+
+    return {
+      totalPipeline,
+      avgMaturity,
+      deploymentReadiness,
+      topSystemicVulnerability,
+      industryBenchmarks,
+      funnel
+    }
+
+  }, [assessments]);
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-slate-900 border-b border-slate-800 text-white shadow-sm">
@@ -58,10 +133,10 @@ export const AdminDashboard: React.FC = () => {
       </header>
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Your Assessments</h2>
-            <p className="mt-1 text-sm text-gray-500">View past governance assessments or conduct a new one.</p>
+            <p className="mt-1 text-sm text-gray-500">Analytics and history across your client portfolio.</p>
           </div>
           <Link 
             to="/assessment" 
@@ -86,7 +161,95 @@ export const AdminDashboard: React.FC = () => {
             </Link>
           </div>
         ) : (
-          <div className="bg-white shadow-sm overflow-hidden border border-gray-200 sm:rounded-lg">
+          <div className="space-y-8">
+            {/* Strategy Tiles */}
+            {analytics && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col">
+                  <div className="flex items-center gap-3 text-gray-500 mb-3">
+                    <Layers className="w-5 h-5 text-blue-500" />
+                    <h3 className="text-sm font-medium">Total Pipeline</h3>
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900">{analytics.totalPipeline}</div>
+                  <p className="text-xs text-gray-500 mt-2">Assessments conducted</p>
+                </div>
+                
+                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col">
+                  <div className="flex items-center gap-3 text-gray-500 mb-3">
+                    <BarChart3 className="w-5 h-5 text-indigo-500" />
+                    <h3 className="text-sm font-medium">Avg Portfolio Maturity</h3>
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900">{analytics.avgMaturity} <span className="text-lg text-gray-400 font-normal">/ 4.0</span></div>
+                  <p className="text-xs text-gray-500 mt-2">Mean maturity score</p>
+                </div>
+
+                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col">
+                  <div className="flex items-center gap-3 text-gray-500 mb-3">
+                    <TrendingUp className="w-5 h-5 text-emerald-500" />
+                    <h3 className="text-sm font-medium">Deployment Ready</h3>
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900">{analytics.deploymentReadiness}%</div>
+                  <p className="text-xs text-gray-500 mt-2">Clients safe for pilot</p>
+                </div>
+
+                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col">
+                  <div className="flex items-center gap-3 text-gray-500 mb-3">
+                    <AlertTriangle className="w-5 h-5 text-rose-500" />
+                    <h3 className="text-sm font-medium">Top Systemic Gap</h3>
+                  </div>
+                  <div className="text-lg font-bold text-gray-900 leading-tight">{analytics.topSystemicVulnerability}</div>
+                  <p className="text-xs text-gray-500 mt-2">Most frequent client failure</p>
+                </div>
+              </div>
+            )}
+
+            {/* Deep Insights Row */}
+            {analytics && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                {/* Industry Benchmarks */}
+                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                  <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-gray-400" />
+                    <h3 className="text-sm font-semibold text-gray-900">Industry Benchmarks</h3>
+                  </div>
+                  <div className="divide-y divide-gray-100 max-h-48 overflow-y-auto">
+                    {analytics.industryBenchmarks.map((b, i) => (
+                      <div key={i} className="px-6 py-3 flex justify-between items-center hover:bg-gray-50">
+                        <span className="text-sm text-gray-600 font-medium">{b.industry}</span>
+                        <span className="text-sm font-bold text-gray-900 bg-gray-100 px-2 py-1 rounded">{b.avg}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Maturity Funnel */}
+                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+                  <div className="px-6 py-4 border-b border-gray-100">
+                    <h3 className="text-sm font-semibold text-gray-900">Client Maturity Funnel</h3>
+                  </div>
+                  <div className="p-6 flex-1 flex flex-col justify-center gap-2">
+                    {['Initial', 'Emerging', 'Developing', 'Managed', 'Mature'].map(level => {
+                      const count = analytics.funnel[level] || 0;
+                      const pct = analytics.totalPipeline > 0 ? (count / analytics.totalPipeline) * 100 : 0;
+                      return (
+                        <div key={level} className="flex items-center gap-3">
+                          <span className="text-xs font-medium text-gray-500 w-20 text-right">{level}</span>
+                          <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-blue-500 rounded-full" style={{ width: `${pct}%` }}></div>
+                          </div>
+                          <span className="text-xs font-bold text-gray-700 w-6">{count}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+              </div>
+            )}
+
+            {/* Table */}
+            <div className="bg-white shadow-sm overflow-hidden border border-gray-200 sm:rounded-xl">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -125,6 +288,7 @@ export const AdminDashboard: React.FC = () => {
                 })}
               </tbody>
             </table>
+          </div>
           </div>
         )}
       </main>
