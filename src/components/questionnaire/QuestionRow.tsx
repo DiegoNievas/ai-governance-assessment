@@ -12,15 +12,14 @@ function cn(...inputs: ClassValue[]) {
 interface QuestionRowProps {
   domainId: string;
   question: Question;
-  isAtturraBranded?: boolean;
 }
 
-export const QuestionRow: React.FC<QuestionRowProps> = ({ domainId, question, isAtturraBranded }) => {
+export const QuestionRow: React.FC<QuestionRowProps> = ({ domainId, question }) => {
   const { setQuestionScore, setQuestionNote, toggleNotApplicable } = useAssessmentStore();
   const [showNotes, setShowNotes] = React.useState(!!question.notes);
 
-  const activeColor = isAtturraBranded ? 'bg-atturra-500 text-white border-atturra-500' : 'bg-blue-600 text-white border-blue-600';
-  const hoverColor = isAtturraBranded ? 'hover:border-atturra-400' : 'hover:border-blue-400';
+  const activeColor = 'bg-blue-600 text-white border-blue-600';
+  const hoverColor = 'hover:border-blue-400';
 
   const handleScore = (score: Score) => {
     if (question.notApplicable) return;
@@ -95,7 +94,7 @@ export const QuestionRow: React.FC<QuestionRowProps> = ({ domainId, question, is
                 onChange={() => toggleNotApplicable(domainId, question.id)}
                 className={cn(
                   "rounded border-gray-300 shadow-sm focus:ring-2 focus:ring-offset-1 transition-colors",
-                  isAtturraBranded ? "text-atturra-600 focus:ring-atturra-500" : "text-blue-600 focus:ring-blue-500"
+                  "text-blue-600 focus:ring-blue-500"
                 )}
               />
               <span className="text-xs text-gray-500 group-hover:text-gray-700 transition-colors">N/A</span>
@@ -106,7 +105,7 @@ export const QuestionRow: React.FC<QuestionRowProps> = ({ domainId, question, is
               onClick={() => setShowNotes(!showNotes)}
               className={cn(
                 "p-1.5 rounded-full transition-colors",
-                showNotes || question.notes ? (isAtturraBranded ? "bg-atturra-100 text-atturra-600" : "bg-blue-100 text-blue-600") : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                showNotes || question.notes ? "bg-blue-100 text-blue-600" : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
               )}
               title="Toggle notes"
             >

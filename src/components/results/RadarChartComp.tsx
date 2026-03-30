@@ -4,18 +4,17 @@ import type { DomainScore } from '../../utils/scoring';
 
 interface RadarChartProps {
   data: DomainScore[];
-  isAtturraBranded?: boolean;
 }
 
-export const RadarChartComp: React.FC<RadarChartProps> = ({ data, isAtturraBranded }) => {
+export const RadarChartComp: React.FC<RadarChartProps> = ({ data }) => {
   const chartData = data.map(d => ({
     subject: d.title,
     A: d.score,
     fullMark: 4,
   }));
 
-  const strokeColor = isAtturraBranded ? '#3e82ac' : '#2563eb';
-  const fillColor = isAtturraBranded ? '#3e82ac' : '#3b82f6';
+  const strokeColor = '#2563eb';
+  const fillColor = '#3b82f6';
 
   return (
     <div className="w-full h-80">

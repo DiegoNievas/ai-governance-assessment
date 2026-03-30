@@ -3,13 +3,12 @@ import { useAssessmentStore } from '../../store/assessmentStore';
 
 interface CustomerDetailsFormProps {
   onNext: () => void;
-  isAtturraBranded?: boolean; // Injected by Layout
 }
 
-export const CustomerDetailsForm: React.FC<CustomerDetailsFormProps> = ({ onNext, isAtturraBranded }) => {
+export const CustomerDetailsForm: React.FC<CustomerDetailsFormProps> = ({ onNext }) => {
   const { customerDetails, setCustomerDetail } = useAssessmentStore();
 
-  const primaryColorClass = isAtturraBranded ? 'bg-atturra-600 hover:bg-atturra-700 focus:ring-atturra-500' : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500';
+  const primaryColorClass = 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -23,8 +22,8 @@ export const CustomerDetailsForm: React.FC<CustomerDetailsFormProps> = ({ onNext
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden max-w-3xl mx-auto">
-      <div className={`px-6 py-5 border-b border-gray-200 ${isAtturraBranded ? 'bg-atturra-50' : 'bg-gray-50'}`}>
-        <h2 className={`text-lg font-medium leading-6 ${isAtturraBranded ? 'text-atturra-900' : 'text-gray-900'}`}>
+      <div className="px-6 py-5 border-b border-gray-200 bg-gray-50">
+        <h2 className="text-lg font-medium leading-6 text-gray-900">
           Customer Assessment Details
         </h2>
         <p className="mt-1 text-sm text-gray-500">

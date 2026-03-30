@@ -6,10 +6,9 @@ import { ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
 interface QuestionnaireSectionProps {
   onNext: () => void;
   onBack: () => void;
-  isAtturraBranded?: boolean;
 }
 
-export const QuestionnaireSection: React.FC<QuestionnaireSectionProps> = ({ onNext, onBack, isAtturraBranded }) => {
+export const QuestionnaireSection: React.FC<QuestionnaireSectionProps> = ({ onNext, onBack }) => {
   const { domains } = useAssessmentStore();
   
   // Start with first domain expanded
@@ -26,7 +25,7 @@ export const QuestionnaireSection: React.FC<QuestionnaireSectionProps> = ({ onNe
     return { answered, total: domain.questions.length, isComplete: answered === domain.questions.length };
   };
 
-  const primaryColor = isAtturraBranded ? 'bg-atturra-600 hover:bg-atturra-700' : 'bg-blue-600 hover:bg-blue-700';
+  const primaryColor = 'bg-blue-600 hover:bg-blue-700';
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -45,14 +44,14 @@ export const QuestionnaireSection: React.FC<QuestionnaireSectionProps> = ({ onNe
               {/* Domain Header */}
               <button
                 onClick={() => toggleDomain(domain.id)}
-                className={`w-full px-6 py-4 flex items-center justify-between transition-colors ${isExpanded ? (isAtturraBranded ? 'bg-atturra-50' : 'bg-blue-50') : 'hover:bg-gray-50'}`}
+                className={`w-full px-6 py-4 flex items-center justify-between transition-colors ${isExpanded ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
               >
                 <div className="flex flex-col items-start gap-1">
                   <div className="flex items-center gap-3">
-                    <span className={`text-sm font-bold w-6 h-6 flex items-center justify-center rounded-full ${isAtturraBranded ? 'bg-atturra-200 text-atturra-800' : 'bg-blue-100 text-blue-800'}`}>
+                    <span className="text-sm font-bold w-6 h-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-800">
                       {domain.id}
                     </span>
-                    <h3 className={`text-lg font-semibold ${isAtturraBranded ? 'text-atturra-900' : 'text-gray-900'}`}>
+                    <h3 className="text-lg font-semibold text-gray-900">
                       {domain.title}
                     </h3>
                   </div>
@@ -81,7 +80,6 @@ export const QuestionnaireSection: React.FC<QuestionnaireSectionProps> = ({ onNe
                       key={q.id} 
                       domainId={domain.id} 
                       question={q} 
-                      isAtturraBranded={isAtturraBranded}
                     />
                   ))}
                 </div>

@@ -6,11 +6,10 @@ import { AlertCircle } from 'lucide-react';
 interface DetailedFindingsProps {
   domains: Domain[];
   results: AssessmentResults;
-  isAtturraBranded?: boolean;
 }
 
-export const DetailedFindings: React.FC<DetailedFindingsProps> = ({ domains, results, isAtturraBranded }) => {
-  const brandClass = isAtturraBranded ? 'bg-atturra-50 border-atturra-200' : 'bg-blue-50 border-blue-200';
+export const DetailedFindings: React.FC<DetailedFindingsProps> = ({ domains, results }) => {
+  const brandClass = 'bg-blue-50 border-blue-200';
 
   const generateAction = (questionText: string): string => {
     // A simple heuristic to generate suggested actions based on the question text

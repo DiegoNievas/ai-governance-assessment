@@ -10,10 +10,9 @@ import html2pdf from 'html2pdf.js';
 
 interface DashboardProps {
   onBack: () => void;
-  isAtturraBranded?: boolean;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ onBack, isAtturraBranded }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ onBack }) => {
   const { customerDetails, domains, submitToCloud } = useAssessmentStore();
   const results = useMemo(() => calculateResults(domains), [domains]);
   
@@ -94,7 +93,7 @@ ${results.recommendedAction}
     }
   };
 
-  const primaryColorBtn = isAtturraBranded ? 'bg-atturra-600 hover:bg-atturra-700' : 'bg-blue-600 hover:bg-blue-700';
+  const primaryColorBtn = 'bg-blue-600 hover:bg-blue-700';
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-12">
@@ -174,7 +173,7 @@ ${results.recommendedAction}
           {/* Radar Chart */}
           <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-gray-900 mb-6 text-center">Maturity by Domain</h3>
-            <RadarChartComp data={results.domainScores} isAtturraBranded={isAtturraBranded} />
+            <RadarChartComp data={results.domainScores} />
           </div>
 
           {/* Top Strengths & Gaps */}
@@ -215,7 +214,7 @@ ${results.recommendedAction}
         <ExecutiveSummary results={results} customerName={customerDetails.customerName} />
 
         {/* Detailed Findings */}
-        <DetailedFindings domains={domains} results={results} isAtturraBranded={isAtturraBranded} />
+        <DetailedFindings domains={domains} results={results} />
       </div>
     </div>
   );
