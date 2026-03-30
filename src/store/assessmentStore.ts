@@ -111,13 +111,15 @@ export const useAssessmentStore = create<AssessmentState>()(
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error("You must be logged in to save to cloud.");
 
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('user_profiles')
           .select('org_id')
           .eq('id', user.id)
           .single();
           
-        if (!profile) throw new Error("Could not find your organization profile.");
+        if (profileError || !profile) {
+          throw new Error("Could not find your organization profile. If your original signup was interrupted, please delete your auth account and sign up again.");
+        }
 
         const { error } = await supabase.from('assessments').insert({
           org_id: profile.org_id,

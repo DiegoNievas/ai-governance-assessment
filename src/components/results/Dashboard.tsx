@@ -84,10 +84,10 @@ ${results.recommendedAction}
       await submitToCloud();
       setSubmitStatus('success');
       setTimeout(() => setSubmitStatus('idle'), 3000);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       setSubmitStatus('error');
-      alert("Failed to save to cloud. Check console for details.");
+      alert(`Failed to save to cloud: ${err.message || 'Check console for details.'}`);
     } finally {
       setIsSubmitting(false);
     }
