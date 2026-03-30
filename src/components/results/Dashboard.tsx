@@ -4,6 +4,7 @@ import { calculateResults } from '../../utils/scoring';
 import { RadarChartComp } from './RadarChartComp';
 import { DetailedFindings } from './DetailedFindings';
 import { ExecutiveSummary } from './ExecutiveSummary';
+import { ImplementationRoadmap } from './ImplementationRoadmap';
 import { AlertTriangle, TrendingUp, CheckCircle, Download, Copy, Printer, CloudUpload } from 'lucide-react';
 // We use dynamic imports for html2pdf to avoid initial bundle bloat and SSR issues if any
 import html2pdf from 'html2pdf.js';
@@ -237,6 +238,9 @@ ${results.recommendedAction}
 
         {/* Executive Summary */}
         <ExecutiveSummary results={results} customerName={customerDetails.customerName} />
+
+        {/* 12-Month Roadmap (Statement of Work) */}
+        <ImplementationRoadmap results={results} />
 
         {/* Detailed Findings */}
         <DetailedFindings domains={domains} results={results} />
