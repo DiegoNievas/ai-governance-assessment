@@ -6,8 +6,6 @@ import { DetailedFindings } from './DetailedFindings';
 import { ExecutiveSummary } from './ExecutiveSummary';
 import { ImplementationRoadmap } from './ImplementationRoadmap';
 import { AlertTriangle, TrendingUp, CheckCircle, Download, Copy, Printer, CloudUpload } from 'lucide-react';
-// We use dynamic imports for html2pdf to avoid initial bundle bloat and SSR issues if any
-import html2pdf from 'html2pdf.js';
 
 import type { AssessmentResults } from '../../utils/scoring';
 import type { CustomerDetails, Domain } from '../../data/questionnaire';
@@ -56,7 +54,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onBack, data, isReadOnly =
     }
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     const element = contentRef.current;
     if (!element) return;
     
@@ -73,6 +71,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onBack, data, isReadOnly =
     };
 
     try {
+      // Dynamically import html2pdf to avoid Vite module resolution crashes
+      const html2pdfModule = await import('html2pdf.js');
+      const html2pdf = html2pdfModule.default || html2pdfModule;
+      
       html2pdf().set(opt).from(element).save();
     } catch (err) {
       console.error("PDF generation failed:", err);
