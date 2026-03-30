@@ -7,12 +7,14 @@ import { Signup } from './pages/Signup';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { AssessmentTool } from './pages/AssessmentTool';
 
+import { LandingPage } from './pages/LandingPage';
+
 const App: React.FC = () => {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           
