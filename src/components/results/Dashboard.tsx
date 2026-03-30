@@ -8,13 +8,27 @@ import { AlertTriangle, TrendingUp, CheckCircle, Download, Copy, Printer, CloudU
 // We use dynamic imports for html2pdf to avoid initial bundle bloat and SSR issues if any
 import html2pdf from 'html2pdf.js';
 
+import type { AssessmentResults } from '../../utils/scoring';
+import type { CustomerDetails, Domain } from '../../data/questionnaire';
+
 interface DashboardProps {
-  onBack: () => void;
+  onBack?: () => void;
+  data?: {
+    customerDetails: CustomerDetails;
+    domains: Domain[];
+    results: AssessmentResults;
+  };
+  isReadOnly?: boolean;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ onBack }) => {
-  const { customerDetails, domains, submitToCloud } = useAssessmentStore();
-  const results = useMemo(() => calculateResults(domains), [domains]);
+export const Dashboard: React.FC<DashboardProps> = ({ onBack, data, isReadOnly = false }) => {
+  const storeData = useAssessmentStore();
+  
+  // Use passed data if provided (historical), otherwise fall back to live store data
+  const customerDetails = data ? data.customerDetails : storeData.customerDetails;
+  const domains = data ? data.domains : storeData.domains;
+  const liveResults = useMemo(() => calculateResults(domains), [domains]);
+  const results = data ? data.results : liveResults;
   
   const contentRef = useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -78,10 +92,13 @@ ${results.recommendedAction}
   };
 
   const handleCloudSubmit = async () => {
+    if (isReadOnly) return;
     setIsSubmitting(true);
     setSubmitStatus('idle');
     try {
-      await submitToCloud();
+      if (!data) {
+        await storeData.submitToCloud();
+      }
       setSubmitStatus('success');
       setTimeout(() => setSubmitStatus('idle'), 3000);
     } catch (err: any) {
@@ -100,20 +117,28 @@ ${results.recommendedAction}
       
       {/* Action Bar */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-        <button onClick={onBack} className="text-sm font-medium text-gray-600 hover:text-gray-900 border border-gray-300 px-4 py-2 rounded-md transition-colors">
-          Edit Assessment
-        </button>
-        <div className="flex flex-wrap gap-3 items-center">
-          {submitStatus === 'success' && <span className="text-green-600 text-sm font-medium mr-2">Saved to Cloud!</span>}
-          <button 
-            onClick={handleCloudSubmit} 
-            disabled={isSubmitting}
-            className={`flex items-center gap-2 text-sm font-medium text-white px-4 py-2 rounded-md shadow-sm transition-colors hide-on-print ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-800 hover:bg-gray-900'}`}
-          >
-            <CloudUpload className="w-4 h-4" /> {isSubmitting ? 'Saving...' : 'Save to Cloud'}
+        {!isReadOnly ? (
+          <button onClick={onBack} className="text-sm font-medium text-gray-600 hover:text-gray-900 border border-gray-300 px-4 py-2 rounded-md transition-colors">
+            Edit Assessment
           </button>
-          
-          <span className="w-px h-6 bg-gray-200 hide-on-print mx-1"></span>
+        ) : (
+          <div>{/* Empty spacer or generic back button could go here */}</div>
+        )}
+        <div className="flex flex-wrap gap-3 items-center w-full justify-end sm:w-auto">
+          {!isReadOnly && (
+            <>
+              {submitStatus === 'success' && <span className="text-green-600 text-sm font-medium mr-2">Saved to Cloud!</span>}
+              <button 
+                onClick={handleCloudSubmit} 
+                disabled={isSubmitting}
+                className={`flex items-center gap-2 text-sm font-medium text-white px-4 py-2 rounded-md shadow-sm transition-colors hide-on-print ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-800 hover:bg-gray-900'}`}
+              >
+                <CloudUpload className="w-4 h-4" /> {isSubmitting ? 'Saving...' : 'Save to Cloud'}
+              </button>
+              
+              <span className="w-px h-6 bg-gray-200 hide-on-print mx-1"></span>
+            </>
+          )}
 
           <button onClick={handleCopyToClipboard} className="flex items-center gap-2 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-300 px-4 py-2 rounded-md transition-colors">
             <Copy className="w-4 h-4" /> Copy Summary
@@ -121,7 +146,7 @@ ${results.recommendedAction}
           <button onClick={() => window.print()} className="flex items-center gap-2 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-300 px-4 py-2 rounded-md transition-colors hide-on-print">
             <Printer className="w-4 h-4" /> Print
           </button>
-          <button onClick={handleExportPDF} className={`flex items-center gap-2 text-sm font-medium text-white px-4 py-2 rounded-md shadow-sm transition-colors hide-on-print ${primaryColorBtn}`}>
+          <button id="export-pdf-btn" onClick={handleExportPDF} className={`flex items-center gap-2 text-sm font-medium text-white px-4 py-2 rounded-md shadow-sm transition-colors hide-on-print ${primaryColorBtn}`}>
             <Download className="w-4 h-4" /> Export PDF
           </button>
         </div>

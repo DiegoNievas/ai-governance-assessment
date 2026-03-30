@@ -6,7 +6,7 @@ import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { AssessmentTool } from './pages/AssessmentTool';
-
+import { ReportViewer } from './pages/ReportViewer';
 import { LandingPage } from './pages/LandingPage';
 
 const App: React.FC = () => {
@@ -27,6 +27,12 @@ const App: React.FC = () => {
           <Route path="/assessment" element={
             <ProtectedRoute>
               <AssessmentTool />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/report/:id" element={
+            <ProtectedRoute>
+              <ReportViewer />
             </ProtectedRoute>
           } />
           

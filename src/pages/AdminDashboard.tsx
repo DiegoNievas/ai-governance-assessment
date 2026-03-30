@@ -2,13 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { FileText, Plus, ShieldAlert, LogOut, TrendingUp, BarChart3, AlertTriangle, Layers, Building2 } from 'lucide-react';
+import { FileText, Plus, ShieldAlert, LogOut, TrendingUp, BarChart3, AlertTriangle, Layers, Building2, MoreVertical, Download } from 'lucide-react';
 import { useMemo } from 'react';
 
 export const AdminDashboard: React.FC = () => {
   const { profile, signOut } = useAuth();
   const [assessments, setAssessments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  
+  // Close dropdown if clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setOpenDropdownId(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const fetchAssessments = async () => {
@@ -280,8 +288,39 @@ export const AdminDashboard: React.FC = () => {
                         {data.customerDetails?.assessmentScope || 'No scope defined'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        {/* Currently we don't have a viewing UI built, but we will soon */}
-                        <button className="text-blue-600 hover:text-blue-900" disabled>View Details</button>
+                        <div className="relative inline-block text-left">
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenDropdownId(openDropdownId === a.id ? null : a.id);
+                            }}
+                            className="p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none"
+                          >
+                            <MoreVertical className="w-5 h-5" />
+                          </button>
+                          
+                          {openDropdownId === a.id && (
+                            <div 
+                              className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20 focus:outline-none overflow-hidden"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <div className="py-1">
+                                <Link 
+                                  to={`/report/${a.id}`} 
+                                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                                >
+                                  <BarChart3 className="w-4 h-4" /> Show Results
+                                </Link>
+                                <Link 
+                                  to={`/report/${a.id}?autoDownload=true`} 
+                                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                                >
+                                  <Download className="w-4 h-4" /> Download PDF
+                                </Link>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   )
