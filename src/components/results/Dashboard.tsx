@@ -59,16 +59,25 @@ export const Dashboard: React.FC<DashboardProps> = ({ onBack, data, isReadOnly =
   const handleExportPDF = () => {
     const element = contentRef.current;
     if (!element) return;
+    
+    // Safely handle missing or undefined customer names
+    const rawName = customerDetails?.customerName || 'Report';
+    const safeName = rawName.replace(/\s+/g, '-');
 
     const opt: any = {
       margin: 10,
-      filename: `AI-Governance-Assessment-${customerDetails.customerName.replace(/\\s+/g, '-')}.pdf`,
+      filename: `AI-Governance-Assessment-${safeName}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    html2pdf().set(opt).from(element).save();
+    try {
+      html2pdf().set(opt).from(element).save();
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      alert("Failed to generate PDF. Please check your browser console.");
+    }
   };
 
   const handleCopyToClipboard = () => {
