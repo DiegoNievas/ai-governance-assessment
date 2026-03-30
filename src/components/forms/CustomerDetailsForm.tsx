@@ -10,7 +10,7 @@ export const CustomerDetailsForm: React.FC<CustomerDetailsFormProps> = ({ onNext
 
   const primaryColorClass = 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500';
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setCustomerDetail(name as any, value);
   };
@@ -50,15 +50,27 @@ export const CustomerDetailsForm: React.FC<CustomerDetailsFormProps> = ({ onNext
 
           <div>
             <label htmlFor="industry" className="block text-sm font-medium text-gray-700">Industry</label>
-            <input
-              type="text"
+            <select
               name="industry"
               id="industry"
               value={customerDetails.industry}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-              placeholder="E.g., Financial Services"
-            />
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border bg-white"
+            >
+              <option value="">Select an industry...</option>
+              <option value="Technology & Software">Technology & Software</option>
+              <option value="Financial Services">Financial Services</option>
+              <option value="Healthcare & Life Sciences">Healthcare & Life Sciences</option>
+              <option value="Manufacturing & Logistics">Manufacturing & Logistics</option>
+              <option value="Retail & Consumer Goods">Retail & Consumer Goods</option>
+              <option value="Public Sector & Government">Public Sector & Government</option>
+              <option value="Education">Education</option>
+              <option value="Energy & Utilities">Energy & Utilities</option>
+              <option value="Telecommunications">Telecommunications</option>
+              <option value="Professional Services">Professional Services</option>
+              <option value="Media & Entertainment">Media & Entertainment</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
 
           <div>
