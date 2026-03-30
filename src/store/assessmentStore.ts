@@ -107,7 +107,21 @@ export const useAssessmentStore = create<AssessmentState>()(
         const state = get();
         const results = calculateResults(state.domains);
         
+        // Get active user and their organization ID
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("You must be logged in to save to cloud.");
+
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('org_id')
+          .eq('id', user.id)
+          .single();
+          
+        if (!profile) throw new Error("Could not find your organization profile.");
+
         const { error } = await supabase.from('assessments').insert({
+          org_id: profile.org_id,
+          created_by: user.id,
           customer_name: state.customerDetails.customerName,
           industry: state.customerDetails.industry || null,
           consultant_name: state.customerDetails.consultantName || null,
