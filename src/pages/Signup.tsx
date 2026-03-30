@@ -36,12 +36,11 @@ export const Signup: React.FC = () => {
       }
 
       // 2. Create the Organization (Tenant)
-      const newOrgId = crypto.randomUUID();
-      const { error: orgError } = await supabase
+      const { data: orgData, error: orgError } = await supabase
         .from('organizations')
-        .insert({ id: newOrgId, name: orgName });
-        // NOTE: We do NOT use .select() here because the initial 
-        // read policy blocks selecting orgs before the profile is linked!
+        .insert({ name: orgName })
+        .select()
+        .single();
         
       if (orgError) throw orgError;
 
@@ -50,7 +49,7 @@ export const Signup: React.FC = () => {
         .from('user_profiles')
         .insert({
           id: authData.user.id,
-          org_id: newOrgId,
+          org_id: orgData.id,
           full_name: fullName,
           role: 'admin' // First user is always admin of their own org
         });
