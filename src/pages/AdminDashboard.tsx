@@ -11,7 +11,11 @@ export const AdminDashboard: React.FC = () => {
 
   useEffect(() => {
     const fetchAssessments = async () => {
-      if (!profile) return;
+      // Don't fetch if profile is not loaded yet and auth is still initializing
+      if (!profile) {
+        setIsLoading(false);
+        return;
+      }
       
       try {
         const { data, error } = await supabase
