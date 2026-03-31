@@ -54,31 +54,59 @@ export const Dashboard: React.FC<DashboardProps> = ({ onBack, data, isReadOnly =
     }
   };
 
+  const [isExporting, setIsExporting] = useState(false);
+
   const handleExportPDF = async () => {
     const element = contentRef.current;
-    if (!element) return;
-    
+    if (!element || isExporting) return;
+
+    setIsExporting(true);
+
     // Safely handle missing or undefined customer names
     const rawName = customerDetails?.customerName || 'Report';
     const safeName = rawName.replace(/\s+/g, '-');
-
-    const opt: any = {
-      margin: 10,
-      filename: `AI-Governance-Assessment-${safeName}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
+    const filename = `AI-Governance-Assessment-${safeName}.pdf`;
 
     try {
-      // Dynamically import html2pdf to avoid Vite module resolution crashes
-      const html2pdfModule = await import('html2pdf.js');
-      const html2pdf = html2pdfModule.default || html2pdfModule;
-      
-      html2pdf().set(opt).from(element).save();
+      const html2canvas = (await import('html2canvas')).default;
+      const { jsPDF } = await import('jspdf');
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        windowWidth: element.scrollWidth,
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const usableWidth = pageWidth - margin * 2;
+      const imgRatio = canvas.height / canvas.width;
+      const imgHeight = usableWidth * imgRatio;
+
+      let heightLeft = imgHeight;
+      let position = margin;
+
+      pdf.addImage(imgData, 'JPEG', margin, position, usableWidth, imgHeight);
+      heightLeft -= (pageHeight - margin * 2);
+
+      while (heightLeft > 0) {
+        position = position - (pageHeight - margin * 2);
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', margin, position, usableWidth, imgHeight);
+        heightLeft -= (pageHeight - margin * 2);
+      }
+
+      pdf.save(filename);
     } catch (err) {
       console.error("PDF generation failed:", err);
-      alert("Failed to generate PDF. Please check your browser console.");
+      alert("Failed to generate PDF. Please check your browser console for details.");
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -158,8 +186,8 @@ ${results.recommendedAction}
           <button onClick={() => window.print()} className="flex items-center gap-2 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-300 px-4 py-2 rounded-md transition-colors hide-on-print">
             <Printer className="w-4 h-4" /> Print
           </button>
-          <button id="export-pdf-btn" onClick={handleExportPDF} className={`flex items-center gap-2 text-sm font-medium text-white px-4 py-2 rounded-md shadow-sm transition-colors hide-on-print ${primaryColorBtn}`}>
-            <Download className="w-4 h-4" /> Export PDF
+          <button id="export-pdf-btn" onClick={handleExportPDF} disabled={isExporting} className={`flex items-center gap-2 text-sm font-medium text-white px-4 py-2 rounded-md shadow-sm transition-colors hide-on-print ${isExporting ? 'bg-gray-400 cursor-not-allowed' : primaryColorBtn}`}>
+            <Download className="w-4 h-4" /> {isExporting ? 'Generating...' : 'Export PDF'}
           </button>
         </div>
       </div>
