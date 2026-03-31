@@ -124,7 +124,7 @@ export const AdminDashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <ShieldAlert className="w-6 h-6 text-blue-400" />
-            <h1 className="font-semibold text-lg">AI Governance Dashboard</h1>
+            <h1 className="font-semibold text-lg">Critera</h1>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium text-slate-300 hidden sm:inline-block">

@@ -14,13 +14,13 @@ export const AppLogo: React.FC<AppLogoProps> = ({ className = '', size = 'md' })
   };
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      <img 
-        src={`${import.meta.env.BASE_URL}app-icon.png`} 
-        alt="Quantum Leap AI Logo" 
+    <div className={`flex items-center gap-2.5 ${className}`}>
+      <img
+        src={`${import.meta.env.BASE_URL}critera-icon.png`}
+        alt="Critera"
         className={`${sizeClasses[size]} object-contain drop-shadow-sm`}
       />
-      <span className="font-bold text-gray-900 tracking-tight">Quantum<span className="text-blue-600">Leap</span></span>
+      <span className="font-bold text-gray-900 tracking-tight">Critera</span>
     </div>
   );
 };
