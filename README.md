@@ -1,6 +1,6 @@
-# AI Governance Assessment SaaS
+# Critera (by Quantum Leap)
 
-**Quantum Leap** – a premium, multitenant SaaS platform that helps AI consultants assess, report, and roadmap AI governance for their clients.  The app provides a sleek landing page, secure authentication, a rich analytics dashboard, one‑click PDF export, historical report viewing, and a dynamically generated 12‑month implementation roadmap.
+**Critera** – a premium, multitenant SaaS platform that helps AI consultants assess, report, and roadmap AI governance for their clients.  The app provides a sleek landing page, secure authentication, a rich analytics dashboard, one‑click PDF export, historical report viewing, and a dynamically generated 12‑month implementation roadmap.
 
 ---
 
@@ -17,9 +17,7 @@
 
 ---
 
-## Overview
-
-The **AI Governance Assessment** tool is designed for AI consultants and MSPs to:
+The **Critera** platform is designed for AI consultants and MSPs to:
 1. Run ISO/IEC 42001‑aligned assessments for client organizations.
 2. Instantly visualise maturity, risk, and industry benchmarks on a premium dashboard.
 3. Export a fully‑styled PDF report (including a custom 12‑month implementation roadmap) for client delivery.
@@ -30,7 +28,7 @@ The **AI Governance Assessment** tool is designed for AI consultants and MSPs to
 
 ## Features
 
-- **Landing Page** – glass‑morphic, dark‑mode ready, with brand‑new Quantum Leap logo and a prominent **Log In** button.
+- **Landing Page** – glass‑morphic, dark‑mode ready, with brand‑new **Critera** logo and a prominent **Log In** button.
 - **Authentication** – sign‑up & login powered by Supabase Auth, with automatic organization UUID generation to bypass RLS read‑blocking.
 - **Multitenant Data Isolation** – each consultant works within their own `organization_id`; all queries are scoped to the current user.
 - **Analytics Dashboard** – four premium metric tiles (Total Pipeline, Avg Portfolio Maturity, Deployment Ready, Top Systemic Gap) plus:
@@ -131,4 +129,4 @@ This project is licensed under the **MIT License**. See the `LICENSE` file for d
 
 ---
 
-*Built with love, glass‑morphism, and a dash of AI‑governance magic.*
+*Critera by Quantum Leap. Built with love, glass‑morphism, and a dash of AI‑governance magic.*
